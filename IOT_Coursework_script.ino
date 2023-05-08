@@ -49,10 +49,10 @@ bool isButtonPressed = false; // the state of the button
 bool buzzerState = false;     // the state of the buzzer
 
 // sensor variables
-int light;
+int fullness;
 int humidity;
 int temperature;
-int dispenses;
+int dispensed;
 
 int buttonPress() {
   int buttonState = digitalRead(buttonPin);
@@ -101,9 +101,9 @@ int buttonPress() {
 // if feeder empty
 bool feederEmpty() {
   // light sensor at bottom of feeder bright
-  int light = analogRead(A3);
+  fullness = analogRead(A3);
   //Serial.println(light);
-  return light > light_cutoff;
+  return fullness > light_cutoff;
 }
 
 void updateBuzzer(bool empty) {
@@ -136,8 +136,18 @@ void updateScreen() {
 
 void updateLog() {
   if (logDelay.justFinished()) {
-    char[] outputString 
-    Serial.println("{ ")
+    Serial.print("{ 'fullness' : ");
+    Serial.print(fullness);
+    Serial.print(", 'temperature' : ");
+    Serial.print(temperature);
+    Serial.print(", 'humidity' : ");
+    Serial.print(humidity);
+    Serial.print(", 'dispensed' : ");
+    Serial.print(dispensed);
+    Serial.println(" }");
+
+    dispensed = 0;
+    logDelay.restart();
   }
 }
 
@@ -182,6 +192,8 @@ void dispense() {
   
   // start delay
   dispenseDelay.start(dispense_delay);
+
+  dispensed++;
 }
 
 // display on lcd time remaining in seconds
@@ -201,19 +213,19 @@ void displayWaitTime() {
 // display the temperature and humidity
 void displayTempHum() {
   // get temperature and humidity
-  auto temp = dht.readTemperature();
-  auto humi = dht.readHumidity();
+  temperature = dht.readTemperature();
+  humidity = dht.readHumidity();
 
   // print temperature line 1
   lcd.setCursor(0,0);
   lcd.print("Temp: ");
-  lcd.print(temp);
+  lcd.print(temperature);
   lcd.print("C     ");
 
   // print humidity line 2
   lcd.setCursor(0,1);
   lcd.print("Humi: ");
-  lcd.print(humi);
+  lcd.print(humidity);
   lcd.print("%     ");
 }
 
@@ -240,10 +252,12 @@ void setup() {
   buzzerDelay.start(1); 
   buzzerDelay.start(1);   
   dispenseDelay.start(1); 
-  log_delay.start(1);
+  logDelay.start(1);
   
   // display starting screen
   displayTempHum();
+
+  dispensed = 0;
 }
 
 void loop() {
