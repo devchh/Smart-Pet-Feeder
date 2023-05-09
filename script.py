@@ -1,10 +1,3 @@
-############################################################################
-# Script Name: cloud.py
-# Description: ThingsBoard - Dual-way Communication
-# Parameters: Buzzer, Temp & Hum. Sensor
-# Copyright: Following code is written for educational purposes by Cardiff University.
-# Latest Version: 15/04/2022 (by Hakan KAYAN)
-############################################################################
 
 import os
 import time
